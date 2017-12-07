@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileParser.Code;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,20 +9,35 @@ namespace FileParser.App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            using (var reader = new StreamReader(@"C:\test.csv"))
+            List<string> fileInput = new List<string>();
+            string path = null;
+            if (args == null || args.Length != 1)
             {
-                List<string> listA = new List<string>();
-                List<string> listB = new List<string>();
+                path = Directory.GetCurrentDirectory() + @"\test.csv";
+            }
+            else
+            {
+                path = args[0];
+            }
+            if(!File.Exists(path))
+            {
+                //no file exists
+                Console.WriteLine("Requested File Does not Exist");                
+                return;
+            }
+            using (var reader = new StreamReader(path))
+            {
+                //Parse file
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
-                    var values = line.Split(';');
-
-                    listA.Add(values[0]);
-                    listB.Add(values[1]);
-                }
+                    fileInput.Add(line);                   
+                }                
             }
+            //Convert to Record List
+            var parsedRecordLines = RecordParser.ParseLines(fileInput);
+
+            //Save Data Here
         }
     }
 }

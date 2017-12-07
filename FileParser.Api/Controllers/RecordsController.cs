@@ -14,21 +14,33 @@ namespace FileParser.Api.Controllers
     {
         // POST: api/records
         [HttpPost]
-        public void Post([FromBody]Record value)
+        public void Post([FromBody]string value)
         {
+            //FileParser.Code.Record.
         }
-        // GET: api/records
-        [HttpGet]
-        public List<string> Get()
-        {
-            return new List<string>{ "value1", "value2" };
-        }
-
-        // GET: api/records/5
+        
+        // GET: api/records/sortby
         [HttpGet("{id}", Name = "Get")]
-        public List<string> Get(string sortby)
+        public List<Record> Get(string sortby)
         {
-            return new List<string> { "value1", "value2" };
+            var records = getRecordList();
+            switch (sortby)
+            {
+                case "gender":
+                    records = records.OrderBy(x => x.Gender).ToList();
+                    break;
+                case "birthdate":
+                    records = records.OrderBy(x => x.DateOfBirth).ToList();
+                    break;
+                case "name":
+                    records = records.OrderBy(x => x.LastName).ThenBy(x=>x.FirstName).ToList();
+                    break;
+                default:
+                    //errorConsole.WriteLine("Default case");
+                    break;
+            }
+
+            return records;
         }
               
         public static List<Record> getRecordList()

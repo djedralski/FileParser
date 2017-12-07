@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FileParser.Code
 {
-    class RecordParser
+    public class RecordParser
     {
 
         public static List<Record> ParseLines(List<string> input)

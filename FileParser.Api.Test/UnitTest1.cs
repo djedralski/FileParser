@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace FileParser.Code.Test
+namespace FileParser.Api.Test
 {
     public class UnitTest1
     {
