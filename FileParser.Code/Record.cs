@@ -54,13 +54,19 @@ namespace FileParser.Code
 
             if (string.IsNullOrEmpty(delim))
             {
-                //error as no valid delimiter
+                throw new ArgumentException($"No Valid Delimiter");
             }
 
             //loop through input and parse data to record
             foreach (var inputString in input)
             {
+                try { 
                 res.Add(ParseLine(inputString, delim));
+                }
+                catch
+                {
+                    throw new ArgumentException($"invalid input: {inputString}" );
+                }
             }
 
             return res;
@@ -72,7 +78,7 @@ namespace FileParser.Code
             var res = input.Split(delimiter);
             if (res.Length != 5)
             {
-                //error
+                throw new ArgumentException($"Incorrect format of Record: {input}");
             }
 
             return new Record(res[0].Trim(), res[1].Trim(), res[2].Trim(), res[3].Trim(), Convert.ToDateTime(res[4].Trim()));
