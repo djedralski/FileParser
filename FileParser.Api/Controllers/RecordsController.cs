@@ -7,25 +7,33 @@ using Microsoft.AspNetCore.Mvc;
 using FileParser.Code;
 using Newtonsoft.Json;
 
+
 namespace FileParser.Api.Controllers
 {
-
     [Route("records")]
     public class RecordsController : Controller
     {
         // POST: records
         [HttpPost]
-        public IActionResult Post([FromBody]IEnumerable<string> recordInput)
+        public IActionResult Post([FromBody]string recordInput)
         {
-            //FileParser.Code.Record.
-            return Ok();
+            try
+            {
+                var parsed = RecordParser.TryParseLine(recordInput).Item1;
+                AddRecord(parsed);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // GET: records/sortby
         [HttpGet("{sortby}", Name = "Get")]
         public IActionResult Get(string sortby)
         {
-            var records = getRecordList();
+            var records = GetRecordList();
 
             switch (sortby)
             {
@@ -45,11 +53,41 @@ namespace FileParser.Api.Controllers
             return Ok(JsonConvert.SerializeObject(records));
         }
 
-        public static List<Record> getRecordList()
+        private List<Record> GetRecordList()
         {
-
-
-            return new List<Record>();
+            
+            const string sessionKey = "Records";
+            List<Record> records;
+            var value = HttpContext.Session.GetString(sessionKey);
+            if (string.IsNullOrEmpty(value))
+            {
+                records = new List<Record>();                
+                HttpContext.Session.SetString(sessionKey, JsonConvert.SerializeObject(records));
+            }
+            else
+            {
+                records = JsonConvert.DeserializeObject<List<Record>>(value);
+            }
+            
+            return records;
         }
+        private void AddRecord(Record record)
+        {
+            const string sessionKey = "Records";
+            List<Record> records;
+            var value = HttpContext.Session.GetString(sessionKey);
+            if (string.IsNullOrEmpty(value))
+            {
+                records = new List<Record> {record};
+                HttpContext.Session.SetString(sessionKey, JsonConvert.SerializeObject(records));
+            }
+            else
+            {
+                records = JsonConvert.DeserializeObject<List<Record>>(value);
+                records.Add(record);
+                HttpContext.Session.SetString(sessionKey, JsonConvert.SerializeObject(records));
+            }
+        }
+
     }
 }
