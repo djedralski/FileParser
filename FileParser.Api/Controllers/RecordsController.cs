@@ -5,25 +5,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FileParser.Code;
+using Newtonsoft.Json;
 
 namespace FileParser.Api.Controllers
 {
-    [Produces("application/json")]
-    [Route("api/records")]
+
+    [Route("records")]
     public class RecordsController : Controller
     {
-        // POST: api/records
+        // POST: records
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]IEnumerable<string> recordInput)
         {
             //FileParser.Code.Record.
+            return Ok();
         }
-        
-        // GET: api/records/sortby
-        [HttpGet("{id}", Name = "Get")]
-        public List<Record> Get(string sortby)
+
+        // GET: records/sortby
+        [HttpGet("{sortby}", Name = "Get")]
+        public IActionResult Get(string sortby)
         {
             var records = getRecordList();
+
             switch (sortby)
             {
                 case "gender":
@@ -33,16 +36,15 @@ namespace FileParser.Api.Controllers
                     records = records.OrderBy(x => x.DateOfBirth).ToList();
                     break;
                 case "name":
-                    records = records.OrderBy(x => x.LastName).ThenBy(x=>x.FirstName).ToList();
+                    records = records.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToList();
                     break;
                 default:
-                    //errorConsole.WriteLine("Default case");
-                    break;
-            }
+                    return NotFound();
 
-            return records;
+            }
+            return Ok(JsonConvert.SerializeObject(records));
         }
-              
+
         public static List<Record> getRecordList()
         {
 
