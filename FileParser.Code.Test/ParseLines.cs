@@ -5,7 +5,7 @@ using Xunit;
 
 namespace FileParser.Code.Test
 {
-    class ParseLines
+    public class ParseLines
     {
         [Fact]
         public void ParseEmpty()

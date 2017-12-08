@@ -12,53 +12,62 @@ namespace FileParser.Code
         {
 
             var res = new List<Record>();
-            int i = 0;
-            String delim = null;
-            // define delimiters of interest
-            string[] delimiters = new string[] { " ", "|", "," };
 
             //If nothing, return empty list
             if (input.Count == 0)
                 return res;
+            var delim =TryParseLine(input.First()).Item2;
 
-            //while there is no delimiter found loop through all delimiters in array
-            while (i< delimiters.Length && string.IsNullOrEmpty(delim))
+            //loop through input and parse data to record
+            foreach (var inputString in input)
             {
                 try
                 {
-                    ParseLine(input.First(), delimiters[i]);
-                    delim = delimiters[i];
-                }              
+                    res.Add(ParseLineWithDelimiter(inputString, delim));
+                }
+                catch
+                {
+                    throw new ArgumentException($"invalid input: {inputString}");
+                }
+            }
+
+            return res;
+        }
+        public static Tuple<Record,string> TryParseLine(string input)
+        {
+            int i = 0;
+            String delim = null;
+
+            // define delimiters of interest
+            string[] delimiters = new string[] { " ", "|", "," };
+
+            //while there is no delimiter found loop through all delimiters in array
+            while (i < delimiters.Length && string.IsNullOrEmpty(delim))
+            {
+                try
+                {
+                    //this will return the parsed line and delimiter if parsable, else errors out
+                    return Tuple.Create<Record, string>(ParseLineWithDelimiter(input, delimiters[i]), delimiters[i]);
+                }
                 finally
                 {
                     i++;
                 }
             }
-            
-            if(string.IsNullOrEmpty(delim))
-            {
-                //error as no valid delimiter
-            }
-            
-            //loop through input and parse data to record
-            foreach(var inputString in input)
-            {
-                res.Add(ParseLine(inputString, delim));
-            }
 
-            return res;
+            //only thrown if not parsable
+            throw new ArgumentException($"No Valid Delimiter");
         }
-
-        public static Record ParseLine(string input, string delimiter)
+        public static Record ParseLineWithDelimiter(string input, string delimiter)
         {
             // define delimiters of interest
             var res = input.Split(delimiter);
             if (res.Length != 5)
             {
-                //error
+                throw new ArgumentException($"Incorrect format of Record: {input}");
             }
 
-            return new Record(res[0].Trim(),res[1].Trim(), res[2].Trim(), res[3].Trim(), Convert.ToDateTime(res[4].Trim()));
+            return new Record(res[0].Trim(), res[1].Trim(), res[2].Trim(), res[3].Trim(), Convert.ToDateTime(res[4].Trim()));
         }
     }
 }
