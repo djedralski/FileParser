@@ -49,6 +49,7 @@ namespace FileParser.Code
                     //this will return the parsed line and delimiter if parsable, else errors out
                     return Tuple.Create<Record, string>(ParseLineWithDelimiter(input, delimiters[i]), delimiters[i]);
                 }
+                catch{ }
                 finally
                 {
                     i++;

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FileParser.Code;
 using Newtonsoft.Json;
-
+using FileParser.Api.Models;
 
 namespace FileParser.Api.Controllers
 {
@@ -15,8 +15,26 @@ namespace FileParser.Api.Controllers
     {
         // POST: records
         [HttpPost]
-        public IActionResult Post([FromBody]string recordInput)
+        public IActionResult Post([FromBody]JsonRecord input)
+        {   
+            try
+            {
+                var parsed = RecordParser.TryParseLine(input.RecordInput).Item1;
+                AddRecord(parsed);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        // Get: records
+        [HttpGet]
+        public IActionResult Post()
         {
+
+            var recordInput =
+                "first1,last1,gender1,color1,11/11/2016";
             try
             {
                 var parsed = RecordParser.TryParseLine(recordInput).Item1;
